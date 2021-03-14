@@ -48,6 +48,8 @@ class BankHandler {
                         AccountOperator(userCard);
                     }
                     break;
+                case 3:
+                    System.out.println("Holding...");
                 default: // Exit the program
                     break;
             }
