@@ -5,11 +5,13 @@ import java.util.Random;
 public class CreditCard {
     private long cardNumber;
     private int pin;
+    private double balance;
 
     // Constructor
     CreditCard() {
         generateCardNumber();
         generatePin();
+        this.balance = 0.0;
     }
 
     // Method to generate the card number
@@ -32,6 +34,7 @@ public class CreditCard {
         this.pin = randomGen.nextInt(9999);
     }
 
+    // Accessors ------------------------------------
     public int getPin() {
         return this.pin;
     }
@@ -39,4 +42,18 @@ public class CreditCard {
     public long getCardNumber() {
         return this.cardNumber;
     }
+
+    public double getBalance() {
+        return this.balance;
+    }
+
+
+
+    // Other ------------------------------------
+    // Check if a given PIN matches the card's PIN
+    public boolean checkPin(int testPin) {
+        return this.pin == testPin;
+    }
+
+
 }
