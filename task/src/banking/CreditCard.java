@@ -79,7 +79,7 @@ public class CreditCard {
         return Long.parseLong(cardNumString);
     }
 
-    // Generate PIN from 0000 to 9999.
+    // Generate PIN from 1111 to 9999.
     private int generatePin() {
         Random randomGen = new Random();
         int newPin = 0;
