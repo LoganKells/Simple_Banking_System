@@ -1,18 +1,23 @@
 package banking;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
-class BankHandler {
+class BankController {
     private Scanner userInput;
     private int userSelection;
+    private int table_id;
     ArrayList<CreditCard> cardOperator = new ArrayList<>();
     ArrayList<Long> cardNums = new ArrayList<Long>();
+    DatabaseBuilder bank_db;
 
     // Constructor
-    BankHandler() {
+    BankController() {
         this.userInput = new Scanner(System.in);
         this.userSelection = -1;
+
+        // Create a new SQLite3 database if one does not already exist.
+        this.bank_db = new DatabaseBuilder();
+        this.bank_db.create_bank_database();
     }
 
     // Method to process user's selection
@@ -36,50 +41,59 @@ class BankHandler {
                 case 1: // Create a credit card
                     int loc = -1;
                     do {
-                        CreditCard c = createCreditCard();
-                        loc = cardNums.indexOf(c.getCardNumber());
+                        CreditCard card = createCreditCard();
+                        loc = cardNums.indexOf(card.getCardNumber());
                     } while (loc > -1);
                     break;
                 case 2: // Log into an account
-                    int operatorIndex = login();
-                    // Open the credit account.
-                    if (operatorIndex >= 0) {
-                        CreditCard userCard = cardOperator.get(operatorIndex);
-                        AccountOperator(userCard);
+                    Account credit_account = login();
+                    if (credit_account.get_account_exists()) {
+                        // Open the credit account navigation so the user can check the balance.
+
+                        userSelection = accountNavigator(credit_account);
+                    } else {
+                        System.out.println("Wrong card number or PIN!");
                     }
                     break;
                 case 3:
                     System.out.println("Holding...");
                 default: // Exit the program
+                    System.out.println("Bye!");
                     break;
             }
         } while (this.userSelection != 0);
+        // Close Database connection
+        this.bank_db.close_connection();
     }
 
     // Try to log the user into an account.
-    public int login() {
+    public Account login() {
         // Prompt the user for their credit card login information
         System.out.println("Enter your card number:");
-        long userCreditNumber = userInput.nextLong();
+        long card_number = userInput.nextLong();
         System.out.println("Enter your PIN:");
-        int userPin = userInput.nextInt();
+        int pin = userInput.nextInt();
 
-        // Determine if the credentials are correct.
-        int databaseIndex = cardNums.indexOf(userCreditNumber);
-        if (databaseIndex >= 0) {
-            // See if the pin is correct.
-            CreditCard userCard = cardOperator.get(databaseIndex);
-            if (userCard.checkPin(userPin)) {
-                System.out.println("You have successfully logged in!");
-            } else {
-                System.out.println("Wrong card number or PIN!");
-            }
-        }
-        return databaseIndex;
+        // Determine if the credentials exist in the database table "card"
+        return bank_db.get_account(card_number, pin);
     }
 
+//    private int check_login_credentials(long card_number, int pin) {
+//        int databaseIndex = cardNums.indexOf(card_number);
+//        if (databaseIndex >= 0) {
+//            // See if the pin is correct.
+//            CreditCard userCard = cardOperator.get(databaseIndex);
+//            if (userCard.checkPin(pin)) {
+//                System.out.println("You have successfully logged in!");
+//            } else {
+//                System.out.println("Wrong card number or PIN!");
+//            }
+//        }
+//        return databaseIndex;
+//    }
+
     // Account Management Operator
-    private void AccountOperator(CreditCard c) {
+    private int accountNavigator(Account credit_account) {
         int userSelect = -1;
         do {
             // Print options
@@ -92,38 +106,42 @@ class BankHandler {
             } catch (InputMismatchException ex) {
                 System.out.println("Error. Please enter an integer selection 0-3");
                 userInput.next(); // Clear input stream
-                AccountOperator(c);
+                accountNavigator(credit_account);
             }
             // Handle the user's selection
             switch (userSelect) {
                 case 1: // Check Balance
-                    double balance = c.getBalance();
-                    System.out.println("Balance: " + balance);
+                    System.out.println("Balance: " + credit_account.get_balance());
                     break;
                 case 2: // Logout
                     System.out.println("You have successfully logged out!");
-                    getUserSelection();
+                    this.userSelection = 0;
                     break;
                 default: // Exit program
+                    System.out.println("Bye!");
                     break;
             }
         } while(userSelect != 0 && userSelect != 2);
+        this.bank_db.close_connection();
+        return 0;
     }
 
     // Create credit cards on demand
     private CreditCard createCreditCard() {
-        CreditCard c = new CreditCard();
+        CreditCard card = new CreditCard();
 
         // Add the credit card to the system.
-        cardNums.add(c.getCardNumber());
-        cardOperator.add(c);
+        cardNums.add(card.getCardNumber());
+        cardOperator.add(card);
 
+        // Add the credit card to the database.
+        this.bank_db.insert_new_card(card.getCardNumber(), card.getPin(), 0);
         // Print the card details for the user
         System.out.println("Your card has been created");
         System.out.println("Your card number:");
-        System.out.println(c.getCardNumber());
+        System.out.println(card.getCardNumber());
         System.out.println("Your card PIN:");
-        System.out.println(c.getPin());
+        System.out.println(card.getPin());
         return new CreditCard();
     }
 }
