@@ -75,6 +75,8 @@ public class DatabaseController {
             // Read the results if the card is found
             if (result.isClosed()) {
                 System.out.println("Such a card does not exist.");
+                System.out.println("Enter your PIN:");
+                int pin = userInput.nextInt();
             } else {
                 result.next();
 
