@@ -2,12 +2,13 @@ package banking;
 import org.sqlite.SQLiteDataSource;
 
 import java.sql.*;
+import java.util.Scanner;
 
-public class DatabaseBuilder {
+public class DatabaseController {
     String myURL = null;
     Connection conn;
 
-    DatabaseBuilder() {
+    DatabaseController() {
         // this.myURL = "jdbc:sqlite:Simple Banking System/task/resources/bank.db";
         this.myURL = "jdbc:sqlite:card.s3db";
         this.conn = open_connection(this.myURL); // Instantiate a connection to the database
@@ -59,42 +60,104 @@ public class DatabaseBuilder {
         }
     }
 
-    public Account get_account(Long card_number, Integer card_pin) {
+    public Account get_account_for_login(Long card_number, Scanner userInput) {
         Account credit_account_return = new Account();
 
-        String sql = "SELECT id, number, pin, balance FROM card where number = ? AND pin = ?";
+        String sql = "SELECT id, number, pin, balance FROM card WHERE number = ?";
 
         try (Connection conn = this.open_connection(this.myURL);
              PreparedStatement prepared_stmt = conn.prepareStatement(sql)) {
+            // Execute the query
             prepared_stmt.setString(1, card_number.toString());
-            prepared_stmt.setString(2, card_pin.toString());
             ResultSet result = prepared_stmt.executeQuery();
 
-            // Read the results
-            result.next();
+            // Read the results if the card is found
+            if (result.isClosed()) {
+                System.out.println("Such a card does not exist.");
+            } else {
+                result.next();
 
-            // Print the results to console
-//            System.out.println(result.getInt("id") + "\t" +
-//                    result.getString("number") + "\t" +
-//                    result.getString("pin") + "\t" +
-//                    result.getDouble("balance"));
-
-            // If the account was found then package the results in a class for returning.
-            long card_number_result = Long.parseLong(result.getString("number"));
-            int card_pin_result = Integer.parseInt(result.getString("pin"));
-            int card_balance_result = result.getInt("balance");
-            if (card_number_result == card_number) {
-                System.out.println("You have successfully logged in!");
-                credit_account_return.set_account_exists(true);
-                credit_account_return.set_card_number(card_number_result);
-                credit_account_return.set_card_pin(card_pin_result);
-                credit_account_return.set_card_balance(card_balance_result);
+                // If the account was found then package the results in a class for returning.
+                long card_number_result = Long.parseLong(result.getString("number"));
+                int card_pin_result = Integer.parseInt(result.getString("pin"));
+                int card_balance_result = result.getInt("balance");
+                if (card_number_result == card_number) {
+                    System.out.println("Enter your PIN:");
+                    int pin = userInput.nextInt();
+                    if (card_pin_result == pin) {
+                        System.out.println("You have successfully logged in!");
+                        credit_account_return.set_account_exists(true);
+                        credit_account_return.set_card_number(card_number_result);
+                        credit_account_return.set_card_pin(card_pin_result);
+                        credit_account_return.set_card_balance(card_balance_result);
+                    } else {
+                        System.out.println("Wrong PIN.");
+                    }
+                }
             }
         } catch (SQLException e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         }
         // Create and return the credit account indicating if the account exists.
         return credit_account_return;
+    }
+
+    public void update_balance(Long account_number, int dollars) {
+        String sql = "UPDATE card "
+                + "SET balance = balance + ? "
+                + "WHERE number = ?";
+
+        try (Connection conn = this.open_connection(this.myURL);
+             PreparedStatement prepared_stmt = conn.prepareStatement(sql)) {
+            // Set the prepared statement parameters
+            prepared_stmt.setInt(1, dollars);
+            prepared_stmt.setString(2, Long.toString(account_number));
+
+            // Update
+            prepared_stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int get_account_balance(Long account_number) {
+        String sql = "SELECT number, balance "
+                + "FROM card "
+                + "WHERE number = ?";
+        int balance = -1;
+
+        try (Connection conn = this.open_connection(this.myURL);
+             PreparedStatement prepared_stmt = conn.prepareStatement(sql)) {
+            // Execute the query
+            prepared_stmt.setString(1, Long.toString(account_number));
+            ResultSet result = prepared_stmt.executeQuery();
+
+            // Read the result
+            result.next();
+            long card_number_result = Long.parseLong(result.getString("number"));
+            if (card_number_result == account_number) {
+                balance = result.getInt("balance");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return balance;
+    }
+
+    public void delete_account(Account credit_account) {
+        String sql = "DELETE FROM card "
+                + "WHERE number = ?";
+        try (Connection conn = this.open_connection(this.myURL);
+             PreparedStatement prepared_stmt = conn.prepareStatement(sql)) {
+
+            // Set the prepared statement parameters
+            prepared_stmt.setString(1, Long.toString(credit_account.get_card_number()));
+
+            // Update
+            prepared_stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void execute_sql_update(String sql) {

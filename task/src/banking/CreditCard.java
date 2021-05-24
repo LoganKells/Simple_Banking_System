@@ -10,14 +10,14 @@ public class CreditCard {
 
     // Constructor
     CreditCard() {
-        this.cardNumber = generateLuhnCardNumber(4_000_000_000_000_000L, 10.0);
+        this.cardNumber = generate_luhn_card_number(4_000_000_000_000_000L, 10.0);
         this.pin = generatePin();
         this.balance = 0.0;
     }
 
     // Method to generate a random card number
     // Card number format: 400000DDDDDDDDDD where D is a random digit. For example 4000075375637831
-    private long generateRandomCardNumber(long bin, double accountLength) {
+    private long generate_random_card_number(long bin, double accountLength) {
         Random randomGen = new Random();
         double exp = 9.0;
         long num = bin;
@@ -32,10 +32,10 @@ public class CreditCard {
 
     // Method to generate a Luhn algorithm compliant card number
     // see https://hyperskill.org/projects/93/stages/516/preview
-    private long generateLuhnCardNumber(long bin, double accountLength) {
+    private long generate_luhn_card_number(long bin, double accountLength) {
         // Step 1 & 2) Generate a card number where the account sequence of 10 digits ends in zero.
         // Example: 4000007062053260
-        long randomCard = generateRandomCardNumber(bin, accountLength);
+        long randomCard = generate_random_card_number(bin, accountLength);
 
         // Convert the card number to an array for easy indexing
         Long num = (Long) randomCard;

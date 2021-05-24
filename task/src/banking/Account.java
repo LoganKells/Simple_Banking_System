@@ -4,15 +4,15 @@ public class Account {
     boolean account_exists;
     long card_number;
     int card_pin;
-    double card_balance;
+    int card_balance;
 
     Account() {
         this.account_exists = false;
         this.card_number = 0;
         this.card_pin = 0;
-        this.card_balance = 0.0;
+        this.card_balance = 0;
     }
-    Account(boolean account_exists, long card_number, int card_pin, double card_balance) {
+    Account(boolean account_exists, long card_number, int card_pin, int card_balance) {
         this.account_exists = account_exists;
         this.card_number = card_number;
         this.card_pin = card_pin;
@@ -31,7 +31,7 @@ public class Account {
         this.card_pin = pin;
     }
 
-    public void set_card_balance(double balance) {
+    public void set_card_balance(int balance) {
         this.card_balance = balance;
     }
 
@@ -39,7 +39,11 @@ public class Account {
         return this.account_exists;
     }
 
-    public double get_balance() {
+    public int get_balance() {
         return this.card_balance;
+    }
+
+    public Long get_card_number() {
+        return this.card_number;
     }
 }
