@@ -52,13 +52,11 @@ class BankMenuController {
                     long card_number = userInput.nextLong();
 
                     // Determine if the credentials exist in the database table "card"
-                    Account credit_account = bank_db.get_account_for_login(card_number, userInput);
+                    Account credit_account = bank_db.return_account_with_login(card_number, userInput);
 
                     // Open the credit account navigation so the user can check the balance.
                     if (credit_account.get_account_exists()) {
                         userSelection = navigate_in_account(credit_account);
-                    } else {
-                        System.out.println("Wrong card number or PIN!");
                     }
 
                     break;
@@ -114,8 +112,8 @@ class BankMenuController {
                     account_operation = 2;
                     System.out.println("Enter Income:");
                     int dollars = userInput.nextInt();
-                    // this.bank_db.add_to_balance(credit_account, dollars);
                     this.bank_db.update_balance(credit_account.get_card_number(), dollars);
+                    System.out.println("Income was added!");
                     break;
                 case 3: // Transfer balance
                     account_operation = 3;
@@ -125,30 +123,57 @@ class BankMenuController {
                     System.out.println("Enter card number:");
                     long recipient_card_number = userInput.nextLong();
 
-                    // TODO Perform pre-validation on the recipient's account number
+                    // Check if the recipient account is the same as the sender's account
+                    if (recipient_card_number == credit_account.get_card_number()) {
+                        System.out.println("You can't transfer money to the same account!");
+                        break;
+                    }
 
-                    // Get the amount to transfer
-                    System.out.println("Enter how much money you want to transfer:");
-                    int dollars_to_send = userInput.nextInt();
+                    // Pre-validate that the card number passes Luhn algorithm check-sum
+                    boolean pass = this.bank_db.check_sum_luhn(recipient_card_number);
+                    if (!pass) {
+                        System.out.println("Probably you made a mistake in the card number.");
+                        break;
+                    }
 
-                    // TODO check if the sender has enough money in their account
+                    // Check that the recipient account exists in DB
+                    Account recipient_account = this.bank_db.return_existing_account(recipient_card_number);
 
-                    // Subtract the funds from the sender's account
-                    this.bank_db.update_balance(credit_account.get_card_number(), -1 * dollars_to_send);
+                    if (recipient_account.get_account_exists()) {
+                        // Get the amount to transfer
+                        System.out.println("Enter how much money you want to transfer:");
+                        int dollars_to_send = userInput.nextInt();
 
-                    // Send Funds to the recipient account
-                    this.bank_db.update_balance(recipient_card_number, dollars_to_send);
+                        // Check if the sender has enough money in their account
+                        int sender_balance = this.bank_db.get_account_balance(credit_account.get_card_number());
+                        if (sender_balance < dollars_to_send) {
+                            System.out.println("Not enough money!");
+                        } else {
+                            // Subtract the funds from the sender's account
+                            this.bank_db.update_balance(credit_account.get_card_number(), -1 * dollars_to_send);
 
+                            // Send Funds to the recipient account
+                            this.bank_db.update_balance(recipient_card_number, dollars_to_send);
+
+                            System.out.println("Success!");
+                        }
+                    }
                     break;
-                case 4: // Close account
-                    account_operation = 4;
+                case 4:
+                    // Close account
+                    account_operation = 0;
                     this.bank_db.delete_account(credit_account);
                     System.out.println("The account has been closed!");
+
+                    // Once the user logs out, go back to main menu
+                    get_main_menu_selection();
                     break;
-                case 5: // Logout
+                case 5:
+                    // Logout
                     account_operation = 5;
                     this.userSelection = 0;
                     System.out.println("You have successfully logged out!");
+
                     // Once the user logs out, go back to main menu
                     get_main_menu_selection();
                     break;

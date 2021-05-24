@@ -32,14 +32,16 @@ public class CreditCard {
 
     // Method to generate a Luhn algorithm compliant card number
     // see https://hyperskill.org/projects/93/stages/516/preview
-    private long generate_luhn_card_number(long bin, double accountLength) {
+    private long generate_luhn_card_number(long bin, double account_length) {
+        // See https://hyperskill.org/projects/93/stages/516/implement
+
         // Step 1 & 2) Generate a card number where the account sequence of 10 digits ends in zero.
         // Example: 4000007062053260
-        long randomCard = generate_random_card_number(bin, accountLength);
+        long randomCard = generate_random_card_number(bin, account_length);
 
         // Convert the card number to an array for easy indexing
-        Long num = (Long) randomCard;
-        String s = num.toString();
+        Long card_number = (Long) randomCard;
+        String s = card_number.toString();
         String[] digits = s.split("");
         int[] integers = new int[16];
         integers = Arrays.stream(digits)
@@ -66,7 +68,8 @@ public class CreditCard {
         // Step 5) Calculate the control number by adding all numbers
         int controlNum = Arrays.stream(newInt).sum();
 
-        // Determine the last digit that ensures the random account number satisfies the Luhn algorithm. The modulus = (control number + checkSum) / 10 should be zero.
+        // Determine the last digit that ensures the random account number satisfies the Luhn algorithm.
+        // The modulus = (control number + checkSum) / 10 should be zero.
         int checkSum = controlNum % 10 == 0
                 ? 0
                 : (10 - (controlNum % 10));
