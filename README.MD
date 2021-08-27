@@ -1,6 +1,6 @@
 # Simple Banking System
 
-This program can perform a variety of operations on matrices including addition, multiplication, finding the determinant, and inverting matrices.
+This program can perform a variety of credit card and banking operations using SQL database. Generates valid card numbers by Luhn algorithm, logging in/out, and transactions.
 
 ## Methods
 Please see *./task/src/banking* for .java source files.
