@@ -1,7 +1,7 @@
 # Simple Banking System
 
 ## Methods
-Please see *./task/src/banking* for .java source files.
+Please see app/src/main for .java source files.
 
 ## Demo
 This program can perform a variety of credit card and banking operations using SQL database. Generates valid card numbers by Luhn algorithm, logging in/out, and transactions.
