@@ -1,4 +1,4 @@
-package banking;
+package Simple_Banking_System;
 import org.sqlite.SQLiteDataSource;
 
 import java.sql.*;
@@ -11,7 +11,7 @@ public class DatabaseController {
 
     DatabaseController() {
         // this.myURL = "jdbc:sqlite:Simple Banking System/task/resources/bank.db";
-        this.myURL = "jdbc:sqlite:card.s3db";
+        this.myURL = "jdbc:sqlite:app/card.s3db";
         this.conn = open_connection(this.myURL); // Instantiate a connection to the database
     }
 

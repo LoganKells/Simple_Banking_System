@@ -14,17 +14,27 @@ plugins {
 repositories {
     // Use JCenter for resolving dependencies.
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
     // Use JUnit test framework.
-    testImplementation("junit:junit:4.13")
+//    testImplementation("junit:junit:4.13")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.0")
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:29.0-jre")
+
+    // SQLite dependency is used by the application.
+    implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+
 }
 
 application {
     // Define the main class for the application.
     mainClass.set("Simple_Banking_System.App")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

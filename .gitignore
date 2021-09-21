@@ -136,6 +136,7 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/intellij,macos
 # Ignore Gradle project-specific cache directory
 .gradle
+.grade/*
 
 # Ignore Gradle build output directory
 build

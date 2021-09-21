@@ -1,4 +1,4 @@
-package banking;
+package Simple_Banking_System;
 
 public class Account {
     boolean account_exists;

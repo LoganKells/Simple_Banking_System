@@ -3,12 +3,15 @@
  */
 package Simple_Banking_System;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.File;
+
 
 public class AppTest {
-    @Test public void testAppHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
+    @Test public void applicationDatabaseCheck() {
+        String databaseFileName = System.getProperty("user.dir") + "/card.s3db";
+        File file = new File(databaseFileName);
+        assertTrue(file.exists());
     }
 }

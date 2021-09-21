@@ -4,11 +4,9 @@
 package Simple_Banking_System;
 
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
-
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        BankMenuController bank = new BankMenuController();
+        bank.get_main_menu_selection();
+        bank.bank_db.close_connection();
     }
 }

@@ -1,4 +1,4 @@
-package banking;
+package Simple_Banking_System;
 
 import java.util.Arrays;
 import java.util.Random;
